@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
 
@@ -45,6 +45,18 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<User> deleteUser(@PathVariable Long id, HttpSession session) {
+        if(session.getAttribute("userId") == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        if(!session.getAttribute("userId").equals(id)){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        userService.getUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public User getUserbyId(@PathVariable Long id) {
         return userService.getUser(id);
@@ -60,8 +72,8 @@ public class UserController {
         return userService.findByEmail(email);
     }
 
-    @GetMapping("/test")
-    public String test(HttpSession session) {
+    @GetMapping("/IsLoggedIn")
+    public String isLoggedIn(HttpSession session) {
         if(session.getAttribute("userId") == null){
             return "Not logged in";
         }
